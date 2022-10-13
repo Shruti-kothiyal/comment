@@ -1,10 +1,12 @@
 const db = require("../../models");
 const bcrypt = require("bcrypt");
 
-const userUpdateController = (req, res) => {
-  const userId = req.userId;
+const consumerUpdateController = (req, res) => {
+  const consumerId = req.consumerId;
   const email = req.body.email;
   const name = req.body.name;
+  const desc=req.body.desc;
+  const expdate=req.body.expdate
   const dob = req.body.dob;
   const password = req.body.password;
   const username = req.body.username;
@@ -12,9 +14,11 @@ const userUpdateController = (req, res) => {
   let image;
   if (img) image = "http://localhost:5000/" + img["filename"];
 
-  const updateUser = {
-    email: email,
+  const updateConsumer = {
     name: name,
+    desc:desc,
+    expdate:expdate,
+    email: email,
     dob: dob,
     username: username,
     image: image,
@@ -28,12 +32,18 @@ const userUpdateController = (req, res) => {
           msg: err,
         });
       } else {
-        updateUser.password = hash;
-        db.User.update(updateUser, {
-          where: {
-            id: userId,
-          },
-        })
+        updateConsumer.password = hash;
+        db.consumer
+          .update(
+            {
+              updateConsumer,
+            },
+            {
+              where: {
+                id: consumerId,
+              },
+            }
+          )
           .then((updateResult) => {
             res.send("Updated the database");
           })
@@ -45,11 +55,12 @@ const userUpdateController = (req, res) => {
       }
     });
   } else {
-    db.User.update(updateUser, {
-      where: {
-        id: userId,
-      },
-    })
+    db.consumer
+      .update(updateConsumer, {
+        where: {
+          id: consumerId,
+        },
+      })
       .then((updateResult) => {
         res.send("Updated the database");
       })
@@ -61,5 +72,5 @@ const userUpdateController = (req, res) => {
   }
 };
 module.exports = {
-  userUpdateController,
+  consumerUpdateController,
 };

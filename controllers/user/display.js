@@ -9,6 +9,4 @@ const userDisplayController=(req,res)=>{
         res.json(emailDisplayResult);
     })
 }
-module.exports= {
-    userDisplayController
-}
+module.exports={userDisplayController}

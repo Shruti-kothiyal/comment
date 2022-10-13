@@ -7,8 +7,8 @@ const userCommmentDelete = (req, res) => {
         id: id,
       },
     })
-    .then((updatedComment) => {
-      if (!updatedComment) res.send("Id does not exist");
+    .then((deletedComment) => {
+      if (!deletedComment) res.send("Id does not exist");
       else res.send("Comment deleted");
     })
     .catch((err) => {

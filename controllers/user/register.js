@@ -1,9 +1,10 @@
-//register.js user
+//register.js
 const bcrypt = require("bcrypt");
 const db = require("../../models");
 var otpGenerator = require("otp-generator");
 const nodemailer = require("nodemailer");
 
+const {nodemailerCreateTransport}=require('../emailSend')
 //const multer = require('multer');
 function AddMinutesToDate(date, minutes) {
   return new Date(date.getTime() + minutes*60000);
@@ -15,8 +16,10 @@ const userRegisterController = (req, res, next) => {
   const password = req.body.password;
   const email = req.body.email;
   const username = req.body.username;
-  const img = req.file;
-  const image = "http://localhost:5000/" + img["filename"];
+  const img=req.file
+  let image
+  if(img)
+    image = "http://localhost:5000/" + img["filename"];
 
   db.User.findOne({
     where:{
@@ -45,22 +48,14 @@ const userRegisterController = (req, res, next) => {
       const now = new Date();
       const expiration_time =  AddMinutesToDate(now,2);
 
-      const transporter = nodemailer.createTransport({
-        host: "smtp.office365.com",
-        port: 587,
-        secure: false,
-        auth: {
-          user: process.env.user,
-          pass: process.env.pass,
-        },
-      });
+      const transporter = nodemailer.createTransport(nodemailerCreateTransport);
 
       const mailOptions = {
         from: `projectrandom1@outlook.com`,
         to: `${email}`,
         subject: "OTP",
         text: `Use OTP ${otp} to access login`,
-      };
+    }
       // verify connection configuration
       transporter.verify(function (error, success) {
         if (error) {
@@ -72,14 +67,6 @@ const userRegisterController = (req, res, next) => {
 
       //Send Email
       transporter.sendMail(mailOptions, (err, response) => {
-        // Create details object containing the email and otp id
-        var details = {
-          timestamp: now,
-          check: email,
-          success: true,
-          message: "OTP sent to user",
-          //otp_id: otp_instance.id,
-        };
         if (err) {
           console.log("Error -> ", err);
           return res.status(400).send({ Status: "Failure", Details: err });

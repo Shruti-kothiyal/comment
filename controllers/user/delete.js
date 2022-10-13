@@ -1,6 +1,6 @@
 const db = require("../../models");
 const userDeleteController = (req, res) => {
-  const userId = req.userId;
+  const userId = req.useriId;
   db.User.destroy({
     where: {
       id: userId,
