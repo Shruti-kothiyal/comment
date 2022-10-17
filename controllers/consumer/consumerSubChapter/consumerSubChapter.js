@@ -5,7 +5,6 @@ const consumerSubChap=(req,res)=>{
     const chapterName=req.body.chapterName
     const uuid=uuidv4();
     const consumerId=req.consumerId
-    console.log("uuid->",uuid)
     db.consumerSubChap.create({
         chapterName:chapterName,
         uuid:uuid,
