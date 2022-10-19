@@ -19,7 +19,10 @@ const userRegisterController = (req, res, next) => {
   const img=req.file
   let image
   if(img)
-    image = "http://localhost:5000/" + img["filename"];
+    image = "http://localhost:3000/" + img["filename"];
+
+  console.log("image name ---> ",image)
+  console.log("image name ---> ",img)
 
   db.User.findOne({
     where:{

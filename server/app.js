@@ -1,6 +1,8 @@
 const express = require('express')
 const app = express()
 app.use(express.json())
+var cors = require('cors')
+app.use(cors())
 require("dotenv").config()
 
 
@@ -21,7 +23,6 @@ const {userCommmentDelete}=require('./controllers/user/comment/userDeleteComment
 //user comment controller like & dislike
 const {userCommentLikes}=require('./controllers/user/comment/likesAndDislikes/likes')
 const {userCommentDisikes}=require('./controllers/user/comment/likesAndDislikes/dislikes')
-//const {userCommentUnlike}=require('./controllers/user/comment/likesAndDislikes/unlike')
 
 
 //consumer controller
@@ -46,7 +47,7 @@ const {imageupload}=require('./middlewares/imageUpload')
 //user api
 app.use(express.static('images'))
 app.post('/api/user/register' ,imageupload.single('image') ,userRegisterController );
-app.get('/api/user/login',userLoginController);
+app.post('/api/user/login',userLoginController);
 app.put('/api/user/update',authverify,imageupload.single('image'),userUpdateController);
 app.delete('/api/user/delete',authverify,userDeleteController);
 app.get('/api/user/display',authverify,userDisplayController);
