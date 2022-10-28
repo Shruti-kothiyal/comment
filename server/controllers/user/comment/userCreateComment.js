@@ -4,7 +4,8 @@ const userCommmentCreate = (req, res) => {
   const userId = req.userId;
   const body = req.body.body;
   let mainCommentId = req.body.mainCommentId;
-  const chapterId = req.body.chapterId;
+  const chapterId = req.body.chapterId
+  db.consumerSubChap.find
   let userData = {
     userId: userId,
     body: body,
@@ -19,11 +20,13 @@ const userCommmentCreate = (req, res) => {
   db.userComment
     .create(userData)
     .then(async (result) => {
-      return res.status(202).send(`Updated`);
+      return res.status(202).send({Status: "Success",Details:result});
+      // return res.status(202).send(`Updated`);
     })
     .catch((err) => {
       console.log(err);
-      return res.status(404).send(`error -> ${err}`);
+      return res.status(500).send({Status: "Failure",Details:err});
+      // return res.status(404).send(`error -> ${err}`);
     });
 };
 

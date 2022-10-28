@@ -12,7 +12,7 @@ const consumerUpdateController = (req, res) => {
   const username = req.body.username;
   const img = req.file;
   let image;
-  if (img) image = "http://localhost:5000/" + img["filename"];
+  if (img) image = "http://localhost:"+process.env.APP_PORT+"/" + img["filename"];
 
   const updateConsumer = {
     name: name,
@@ -28,9 +28,8 @@ const consumerUpdateController = (req, res) => {
   if (password) {
     bcrypt.hash(password, 10, (err, hash) => {
       if (err) {
-        return res.status(500).send({
-          msg: err,
-        });
+        return res.status(500).send({Status: "Failure",Details:err});
+        //return res.status(500).send({msg: err,});
       } else {
         updateConsumer.password = hash;
         db.consumer
@@ -45,16 +44,17 @@ const consumerUpdateController = (req, res) => {
             }
           )
           .then((updateResult) => {
-            res.send("Updated the database");
+            return res.status(202).send({Status: "Success",Details:updateResult});
+            //res.send("Updated the database");
           })
           .catch((error) => {
             console.log(error);
-            res.send("Cannot update");
-            //res.send(error)
+            return res.status(404).send({Status: "Failure",Details:error});
+            //res.send("Cannot update");
           });
       }
     });
-  } else {
+  }else {
     db.consumer
       .update(updateConsumer, {
         where: {
@@ -62,12 +62,13 @@ const consumerUpdateController = (req, res) => {
         },
       })
       .then((updateResult) => {
-        res.send("Updated the database");
+        return res.status(202).send({Status: "Success",Details:updateResult});
+        //res.send("Updated the database");
       })
       .catch((error) => {
         console.log(error);
-        res.send("Cannot update");
-        //res.send(error)
+        return res.status(404).send({Status: "Failure",Details:error});
+        //res.send("Cannot update");
       });
   }
 };

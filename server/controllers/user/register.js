@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const db = require("../../models");
 var otpGenerator = require("otp-generator");
 const nodemailer = require("nodemailer");
+const {Op} = require("sequelize")
 
 const {nodemailerCreateTransport}=require('../emailSend')
 //const multer = require('multer');
@@ -10,38 +11,40 @@ function AddMinutesToDate(date, minutes) {
   return new Date(date.getTime() + minutes*60000);
 }
 
-const userRegisterController = (req, res, next) => {
+const userRegisterController = async(req, res, next) => {
   const name = req.body.name;
   const dob = req.body.dob;
   const password = req.body.password;
   const email = req.body.email;
-  const username = req.body.username;
+  const username = req.body.username || '';
   const img=req.file
   let image
   if(img)
     image = "http://localhost:3000/" + img["filename"];
 
-  console.log("image name ---> ",image)
-  console.log("image name ---> ",img)
+  // console.log("image name ---> ",image)
+  // console.log("image name ---> ",img)
 
-  db.User.findOne({
+  const result = await db.User.destroy({
     where:{
       email:email,
       status:0
     }
-  }).then((userEmailExistResult)=>{
-    db.User.destroy({
-      where:{
-        email:email
-      }
-    })
   })
+  console.log(result);
+  const findUser=await db.User.findOne({
+    where:{
+      [Op.or]:[{email:email},{username:username}]
+    }
+  })
+  console.log("user is present or not ------>",findUser)
+  if(findUser!==null)
+  return res.status(500).send({Status: "Failure",msg:"User already present"});
 
   bcrypt.hash(password, 10, (err, hash) => {
     if (err) {
-      return res.status(500).send({
-        msg: err,
-      });
+      return res.status(500).send({Status: "Failure",Details:err});
+      //return res.status(500).send({msg: err,});
     } else {
       var otp = otpGenerator.generate(6, {
         lowerCaseAlphabets: false,
@@ -69,12 +72,12 @@ const userRegisterController = (req, res, next) => {
       });
 
       //Send Email
-      transporter.sendMail(mailOptions, (err, response) => {
+      transporter.sendMail(mailOptions,async(err, response) => {
         if (err) {
           console.log("Error -> ", err);
           return res.status(400).send({ Status: "Failure", Details: err });
         } else {
-          db.User.create({
+          await db.User.create({
             name: name,
             dob: dob,
             password: hash,
@@ -85,7 +88,7 @@ const userRegisterController = (req, res, next) => {
           })
             .then(async (result) => {
               //Create OTP instance in DB
-              const otp_instance = await db.otp
+              await db.otp
                 .create({
                   userId: result.dataValues["id"],
                   otp: otp,
@@ -101,7 +104,8 @@ const userRegisterController = (req, res, next) => {
             .catch((err) => {
               console.log("catch -> executed user table");
               console.log(err);
-              return res.send("can not sent otp to the number2");
+              return res.status(404).send({Status: "Failure",msg: "OTP incorrect",Details:err});
+              //return res.send("can not sent otp to the number2");
             });
           return res.send({ Status: "Success", Details: response });
         }

@@ -24,9 +24,8 @@ const userUpdateController = (req, res) => {
   if (password) {
     bcrypt.hash(password, 10, (err, hash) => {
       if (err) {
-        return res.status(500).send({
-          msg: err,
-        });
+        return res.status(500).send({Status: "Failure",Details:err});
+        //return res.status(500).send({msg: err,});
       } else {
         updateUser.password = hash;
         db.User.update(updateUser, {
@@ -35,12 +34,13 @@ const userUpdateController = (req, res) => {
           },
         })
           .then((updateResult) => {
-            res.send("Updated the database");
+            return res.status(202).send({Status: "Success",Details:updateResult});
+            //res.send("Updated the database");
           })
           .catch((error) => {
             console.log(error);
-            res.send("Cannot update");
-            //res.send(error)
+            return res.status(404).send({Status: "Failure",Details:error});
+            //res.send("Cannot update");
           });
       }
     });
@@ -51,12 +51,13 @@ const userUpdateController = (req, res) => {
       },
     })
       .then((updateResult) => {
-        res.send("Updated the database");
+        return res.status(202).send({Status: "Success",Details:updateResult});
+        //res.send("Updated the database");
       })
       .catch((error) => {
         console.log(error);
-        res.send("Cannot update");
-        //res.send(error)
+        return res.status(404).send({Status: "Failure",Details:error});
+        //res.send("Cannot update");
       });
   }
 };

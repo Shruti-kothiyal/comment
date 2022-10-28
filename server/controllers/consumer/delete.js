@@ -7,11 +7,13 @@ const consumerDeleteController = (req, res) => {
     },
   })
     .then((userDestroyResult) => {
-      res.status(202).send("Successfully destroyed consumer table");
+      return res.status(202).send({Status: "Success",Details:userDestroyResult});
+      //res.status(202).send("Successfully destroyed consumer table");
     })
     .catch((err) => {
-        console.log(err)
-      res.status(404).send("could not destroy consumer table");
+      //console.log(err)
+      return res.status(404).send({Status: "Failure",Details:err});
+      //res.status(404).send("could not destroy consumer table");
     });
 };
 module.exports = {

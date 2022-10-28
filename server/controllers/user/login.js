@@ -50,17 +50,18 @@ const userLoginController = (req, res) => {
                     }).then(()=>{
                       return res.status(200).send(tokenCreate);
                     }).catch((err)=>{
-                      return res.send('otp error2')
+                      return res.status(404).send({Status: "Failure",msg: "OTP incorrect",Details:err});
+                      //return res.send('otp error2')
                     })
                     
                   }).catch((err)=>{
-                    return res.send(`status error`)
+                    return res.status(404).send({Status: "Failure",Details:err});
+                    //return res.send(`status error`)
                   })
                   
                 } else {
-                  return res.status(404).send({
-                    msg: "OTP incorrect",
-                  });
+                  return res.status(404).send({Status: "Failure",msg: "OTP incorrect"});
+                  //return res.status(404).send({msg: "OTP incorrect",});
                 }
               } else {
                 db.User
@@ -71,21 +72,25 @@ const userLoginController = (req, res) => {
                   })
                   .then((userDestroyResult) => {
                     console.log("otp table data destroyed because it exceeded the expiry time");
-                    res.status(404).send(`OTP expired\nRegister again`);
+                    return res.status(404).send({Status: "Failure",msg: "OTP incorrect",Details:userDestroyResult});
+                    //res.status(404).send(`OTP expired\nRegister again`);
                   })
                   .catch((err) => {
                     console.log("otp table has error\n", err);
-                    res.status(404).send(`otp error`);
+                    return res.status(404).send({Status: "Failure",msg: "OTP incorrect",Details:err});
+                    //res.status(404).send(`otp error`);
                   });
               }
             }else{
               console.log("OTP was deleted from database as it was expired")
-              res.status(404).send(`OTP expired`);
+              return res.status(404).send({Status: "Failure",msg: "OTP expired",Details:err});
+              //res.status(404).send(`OTP expired`);
             }
           })
           .catch((error) => {
             console.error("Error ->",error);
-            res.status(404).send(`Something went wrong`);
+            return res.status(404).send({Status: "Failure",Details:error});
+            // res.status(404).send(`Something went wrong`);
           });
       } else if((password) && (!otp) && result.dataValues['status']===true){
         db.User.findOne({
@@ -104,27 +109,27 @@ const userLoginController = (req, res) => {
 
             if (bErr) {
               //throw bErr;
-              return res.status(401).send({
-                msg: "Username or password is incorrect1!",
-              });
+              return res.status(404).send({Status: "Failure",msg: "Username or Password is incorrect",Details:bErr});
+              //return res.status(401).send({msg: "Username or password is incorrect1!",});
             }
 
             if (bResult) {
               return res.status(200).send(tokenCreate);
             }
-            return res.status(401).send({
-              msg: "Username or password is incorrect2!",
-            });
+            return res.status(401).send({Status: "Failure",msg: "Username or password is incorrect"});
+            //return res.status(401).send({msg: "Username or password is incorrect2!",});
           }
         );
       }
       else{
-        res.send(`User not registered yet`)
+        return res.status(404).send({Status: "Failure",msg: "User not registered"});
+        //res.send(`User not registered yet`)
       }
     })
     .catch((error) => {
-      res.send(`User does not exist`)
+      //res.send(`User does not exist`)
       console.error("Wrong email : ", error);
+      return res.status(404).send({Status: "Failure",msg: "User not registered",Details:error});
     });
 };
 module.exports = {

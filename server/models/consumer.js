@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
   consumer.init({
     name: DataTypes.STRING,
     desc: DataTypes.STRING,
+    expdate: DataTypes.DATE,
     dob: DataTypes.STRING,
     password: DataTypes.STRING,
     email: DataTypes.STRING,

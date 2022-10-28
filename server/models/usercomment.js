@@ -11,6 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+        models.userComment.belongsTo(models.User, { foreignKey: 'userId', as: 'user'})
+        models.userComment.hasMany(models.userComment, { foreignKey: 'mainCommentId', as: 'replies'})
     }
   }
   userComment.init({
@@ -18,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     body: DataTypes.STRING,
     isReply: DataTypes.BOOLEAN,
     mainCommentId: DataTypes.INTEGER,
-    chapterId: DataTypes.STRING,
+    chapterId: DataTypes.INTEGER,
     likes: DataTypes.INTEGER,
     dislikes: DataTypes.INTEGER
   }, {

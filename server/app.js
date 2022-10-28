@@ -41,12 +41,13 @@ const {consumerSubChapUpdate}=require('./controllers/consumer/consumerSubChapter
 //middleware
 const {authverify,authverify2}=require('./middlewares/authVerify')
 const {imageupload}=require('./middlewares/imageUpload')
-
-
+const consumerValidation=require('./middlewares/consumer.validator')
+const userValidation=require('./middlewares/user.validator')
+const consumerValidationUpdate=require('./middlewares/consumerUpdate.validator')
 
 //user api
 app.use(express.static('images'))
-app.post('/api/user/register' ,imageupload.single('image') ,userRegisterController );
+app.post('/api/user/register' ,imageupload.single('image') ,userValidation,userRegisterController );
 app.post('/api/user/login',userLoginController);
 app.put('/api/user/update',authverify,imageupload.single('image'),userUpdateController);
 app.delete('/api/user/delete',authverify,userDeleteController);
@@ -66,9 +67,9 @@ app.get('/api/comment/dislike',authverify,userCommentDisikes)
 
 
 //consumer api
-app.post('/api/consumer/register' ,imageupload.single('image') ,consumerRegisterController )
+app.post('/api/consumer/register' ,imageupload.single('image'),consumerValidation ,consumerRegisterController )
 app.get('/api/consumer/login',consumerLoginController)
-app.put('/api/consumer/update',authverify2,imageupload.single('image'),consumerUpdateController)
+app.put('/api/consumer/update',authverify2,imageupload.single('image'),consumerValidationUpdate,consumerUpdateController)
 app.delete('/api/consumer/delete',authverify2,consumerDeleteController)
 app.get('/api/consumer/display',authverify2,consumerDisplayController);
 //consumer subchap api

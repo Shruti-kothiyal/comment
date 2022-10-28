@@ -6,7 +6,8 @@ const userDisplayController=(req,res)=>{
             id:userId
         }
     }).then((emailDisplayResult) => {
-        res.json(emailDisplayResult);
+        return res.status(202).json(emailDisplayResult);
+       // res.json(emailDisplayResult);
     })
 }
 module.exports={userDisplayController}

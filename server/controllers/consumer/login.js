@@ -64,16 +64,15 @@ const consumerLoginController = (req, res) => {
                           return res.status(200).send(tokenCreate);
                         })
                         .catch((err) => {
-                          return res.send("otp error2");
+                          return res.status(404).send({Status: "Failure",msg: "OTP incorrect",Details:err});
+                          //return res.send("otp error2");
                         });
                     })
                     .catch((err) => {
-                      return res.send(`status error`);
+                      return res.status(404).send({Status: "Failure",msg: "Status error",Details:err});
                     });
                 } else {
-                  return res.status(404).send({
-                    msg: "OTP incorrect",
-                  });
+                  return res.status(404).send({Status: "Failure",msg: "OTP incorrect",Details:err});
                 }
               } else {
                 db.consumer
@@ -83,24 +82,22 @@ const consumerLoginController = (req, res) => {
                     },
                   })
                   .then((userDestroyResult) => {
-                    console.log(
-                      "otp table data destroyed because it exceeded the expiry time"
-                    );
-                    res.status(404).send(`OTP expired\nRegister again`);
+                    console.log("otp table data destroyed because it exceeded the expiry time");
+                    res.status(404).send({Status:"Failure",Details:userDestroyResult});
                   })
                   .catch((err) => {
                     console.log("otp table has error\n", err);
-                    res.status(404).send(`otp error`);
+                    res.status(404).send({Status:"Failure",Details:err});
                   });
               }
             } else {
               console.log("OTP was deleted from database as it was expired");
-              res.status(404).send(`OTP expired`);
+              res.status(404).send({Status:"Failure",Details:otpresult});
             }
           })
           .catch((error) => {
             console.error("Error ->", error);
-            res.status(404).send(`Something went wrong`);
+            res.status(404).send({Status:"Failure",Details:error});
           });
       } else if (password && !otp && result.dataValues["status"] === true) {
         db.consumer.findOne({
@@ -119,28 +116,27 @@ const consumerLoginController = (req, res) => {
 
             if (bErr) {
               //throw bErr;
-              return res.status(401).send({
-                msg: "Username or password is incorrect1!",
-              });
+              return res.status(401).send({Status:"Failure",msg: "Username or password is incorrect!",Details:bErr});
             }
 
             if (bResult) {
               return res.status(200).send(tokenCreate);
             }
-            return res.status(401).send({
-              msg: "Username or password is incorrect2!",
-            });
+            return res.status(401).send({Status:"Failure",msg: "Username or password is incorrect!"});
           }
         );
       }else if((!password)&&(otp)&& result.dataValues["status"] === true){
-        res.send(`You are registered user, login with password`);
+        res.status(401).send({Status:"Failed",msg:"Registered User"});
+        //res.send(`You are registered user, login with password`);
       } else {
-        res.send(`User not registered yet`);
+        res.status(401).send({Status:"Failure",msg:"Unvalid user"});
+        //res.send(`User not registered yet`);
       }
     })
     .catch((error) => {
-      res.send(`User does not exist`);
-      console.error("Wrong email : ", error);
+      res.status(404).send({Status:"Failure",msg:"User not found"});
+      // res.send(`User does not exist`);
+      // console.error("Wrong email : ", error);
     });
 };
 module.exports = {
