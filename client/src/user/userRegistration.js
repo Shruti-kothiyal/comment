@@ -9,6 +9,7 @@ const UserRegister=()=>{
     const [userEmailReg,setUserEmailReg]=useState('')
     const [userUserNameReg,setUserUserNameReg]=useState('')
     const [userImageReg,setUserImageReg]=useState('')
+    const [msg, setMsg] = useState('');
 
     const UserRegister=async(e)=>{
         try{
@@ -22,7 +23,7 @@ const UserRegister=()=>{
             })
         }catch(error){
             if(error.response){
-                console.log("error----------->",error)
+                setMsg(error.response.data.msg)
             }
         }
     }
@@ -69,6 +70,7 @@ const UserRegister=()=>{
             </p>
 
             <button onClick={UserRegister}>Sign Up</button>
+            <p>{msg}</p>
         </div>
     )
 

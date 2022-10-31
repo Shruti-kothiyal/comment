@@ -6,6 +6,7 @@ const UserLogin=()=>{
     const [email,setUserEmailLogin]=useState('')
     const [otp,setUserOtpLogin]=useState('')
     const [password,setUserPasswordLogin]=useState('')
+    const [msg,setMsg]=useState('')
 
     const UserLogin=async(e)=>{
         try{
@@ -13,16 +14,24 @@ const UserLogin=()=>{
                 email:email,
                 otp:otp,
                 password:password
+            }).then((response) => {
+                if (response.data.error) {
+                  alert(response.data.error);
+                }
+                else{
+                    console.log("local storage token",response.data.token)
+                    localStorage.setItem("token",response.data.token)
+                }
             })
         }catch(error){
             if(error.response){
-                console.log("error----------->",error)
+                setMsg(error.response.data.msg)
             }
         }
     }
     let state=1
 
-    return(
+    return( 
         <div className="App">
             <h1>Login</h1>
             <label>Email
@@ -44,6 +53,7 @@ const UserLogin=()=>{
                 </p>
             )}
             <button onClick={UserLogin}>Login</button>
+            <p>{msg}</p>
         </div>
     )
 
